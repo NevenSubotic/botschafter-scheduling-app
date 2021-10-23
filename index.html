@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+      <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">      
+    <?!= include("css") ?>
+  </head>
+  <body>
+    
+    <div id="app" class="container">
+      <div class="row s12">
+        <h3 class="n2s-blue-text">Terminvereinbarung</h3>
+        <p>Bitte 2-3 Termine auswählen indem Du sie anklickst. Danach deinen Namen einfügen und absenden. <br>
+        Du kannst Termine auswählen oder abwählen indem Du auf sie klickst.<br>
+        Ich melde mich in den nächsten Tagen zurück mit einer Bestätigung.
+        </p>
+      </div>
+      <div id="loading" class="progress">
+        <div class="indeterminate"></div>
+      </div>
+      <ul id="eventsContainer" class="collapsible"></ul>
+    </div>
+    <br>
+    <div class="actions container">
+      <div class="row">
+        <div class="col s12">
+          Hier deinen Namen eingeben nachdem du deine Auswahl getroffen hast und dann auf Bestätigen klicken.
+        </div>
+        <div class="col s12 m4 input-field">         
+          <input id="name" type="text" required/>
+          <label for="name">Name</label>
+        </div>
+        <div class="col s12 m4  input-field">         
+          <input id="email" type="email" required/>
+          <label for="email">Email</label>
+        </div>
+        <div class="col s12 m4 input-field">
+          <button href="#!" id="submit" class="btn waves-effect waves-light n2s-blue-bg" type="submit" name="action">
+            Bestätigen<i class="material-icons right">send</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    
+  <!-- Modal Trigger -->
+  <a id="modal-trigger" class="hide waves-effect waves-light btn modal-trigger" href="#success">Modal</a>
+
+    <!-- Modal Structure -->
+    <div id="success" class="modal">
+      <div class="modal-content">
+        <h3>Danke, deine Anfrage ist angekommen.</h3>
+        <p>Ich melde mich zeitnah per E-Mail mit einer Bestätgigung.</p>
+      </div>
+      <div class="modal-footer">
+        <div class="center-align">
+          <button class="modal-close waves-effect waves-green n2s-blue-med-bg btn-flat">Schließen</button>
+        </div>
+      </div>
+    </div>
+   
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <?!= include("js"); ?>           
+  </body>
+</html>
+
+

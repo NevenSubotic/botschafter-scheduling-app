@@ -1,0 +1,26 @@
+{
+  "timeZone": "Europe/Paris",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "SheetsLibrary",
+        "libraryId": "1GK54q01ttMk2pXDb0qOkZZEDvXcd6MK15gj9WLBTPHMLQvJDGVmDEr7s",
+        "version": "10",
+        "developmentMode": true
+      }
+    ],
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Calendar",
+        "version": "v3",
+        "serviceId": "calendar"
+      }
+    ]
+  },
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "ANYONE_ANONYMOUS"
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8"
+}

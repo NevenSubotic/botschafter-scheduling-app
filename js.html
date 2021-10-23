@@ -1,0 +1,294 @@
+<script>
+  const isTest = false;
+  const MIN_SELECTED_EVENTS = 1;
+  const MAX_SELECTED_EVENTS = 3;
+
+  const app = document.getElementById("app");
+  const eventsContainer = document.getElementById("eventsContainer");
+  const submitBtn = document.getElementById("submit");
+  const nameInput = document.getElementById("name");
+  const emailInput= document.getElementById("email");
+  const successModal = document.getElementById("success");
+  const modalTrigger = document.getElementById("modal-trigger");
+  const loadingEl = document.getElementById("loading");
+
+  let formWasSubmitted = false;
+ 
+  // QUERIES
+  // .selected
+  function getSelectedEvents(){      
+    return app.getElementsByClassName("selected");
+  }
+  // .selected as Obj
+  function getSelectedEventsAsObj(){
+    const selectedEvents = getSelectedEvents();
+    let selectedEventsArr = [];
+    
+    for( let i=0; i<selectedEvents.length; i++ ){
+      const selectedEvent = selectedEvents[i];
+    
+      selectedEventsArr.push({            
+        id : selectedEvent.id,
+        startDate : selectedEvent.querySelector(".startDate").innerText,
+        startTime : selectedEvent.querySelector(".startTime").innerText,
+        start : selectedEvent.querySelector(".start").innerText,
+        user: nameInput.value,
+        email: emailInput.value
+      });
+    };
+    
+    return selectedEventsArr
+  }  
+
+
+  // EVENTS
+  document.addEventListener("DOMContentLoaded", function (){  
+    M.AutoInit();
+  });
+
+  // Toggle calEvent
+  app.addEventListener("click", function(e){
+    e.preventDefault();
+    const targetEl = e.target;
+    const calEvent = targetEl.closest('.event');
+    
+    if( calEvent ){
+      toggleSelectedEvent(calEvent);
+    }   
+    
+    function toggleSelectedEvent( event ){    
+      event.classList.toggle("selected");
+      
+      const selectedEvents = document.getElementsByClassName("selected");
+      if( selectedEvents.length > MAX_SELECTED_EVENTS ){
+        const msg = "Bitte nicht mehr als "+ MAX_SELECTED_EVENTS +" Termine auswählen"
+        M.toast({html:msg});
+      }
+    }
+  }); // END CLICK
+
+
+  // Submit Button Clicked
+  submitBtn.addEventListener("click", function(e){
+    e.preventDefault();
+    e.target.disabled = true;
+    
+    if( !isReady() ){
+      e.target.disabled = false;
+      return
+    } 
+    
+    const selectedEventsArr = getSelectedEventsAsObj();
+    google.script.run
+      .withSuccessHandler(handleSuccess)
+      .handleFormSubmissionFromUser(JSON.stringify(selectedEventsArr));
+
+    
+    function isReady(){
+      if( formWasSubmitted ){
+        M.toast({html:"Formular wurde bereits verschickt."});
+        return
+      }
+    
+      if( !nameInput.value || !emailInput.value){
+        let missingElementsHolder = [];
+        !nameInput.value ? missingElementsHolder.push("Name") : "";
+        !emailInput.value ? missingElementsHolder.push("Email") : "";
+        const missingElements = missingElementsHolder.join(", ");
+
+        M.toast({html: missingElements + ' eingeben dann erneut versuchen.'});
+        return
+      }
+      
+      const selectedEvents = getSelectedEvents();
+      if( selectedEvents.length < MIN_SELECTED_EVENTS ){
+        const msg = "Bitte "+ MIN_SELECTED_EVENTS +" bis "+ MAX_SELECTED_EVENTS +" Termine auswählen"
+        M.toast({html: msg});
+        return
+      }
+      
+      return true
+    }
+    
+    function handleSuccess(){
+      wasSuccessful = true;
+      modalTrigger.click();
+    }
+    
+  }); // END SUBMIT
+
+  if( isTest ){
+    const sampleEvents = generateSampleEvents();
+    displayEvents( JSON.stringify(sampleEvents) );
+
+  } else {
+    google.script.run
+    .withSuccessHandler(displayEvents)
+    .withFailureHandler(showError)
+    .getAllEventsFromCalender();
+  }
+
+  // Display Events
+  function displayEvents( eventsObjs ){
+    const events = JSON.parse(eventsObjs);
+    const eventsClean = [];
+    let availableWeeks = [];
+    let weeksWithEvents = [];
+    let output = '';
+
+    if( !events.length ){
+      loadingEl.classList.add("hide");
+      eventsContainer.innerHTML = "<h6>Momentan sind keine Zeiten verfügbar…</h6>";
+      return
+    }
+    
+    events.forEach( function(event){   
+      const eventObj = generateEventObj(event);
+      eventsClean.push(eventObj);
+    });
+    
+    // Group events into Calendar-Weeks
+    eventsClean.forEach( function(event, i){         
+      const indexOfEventWeek = availableWeeks.indexOf( event.weekNum );          
+
+      if( indexOfEventWeek === -1 ){
+        availableWeeks.push( event.weekNum );
+        weeksWithEvents.push( [event.weekNum, [event]] );
+
+      } else {
+        weeksWithEvents[indexOfEventWeek][1].push(event);
+      }          
+    });   
+    
+    // output for each Calendar-Week, which contains events
+    weeksWithEvents.forEach( function(weekWithEvent){
+      output += generateWeekElement( weekWithEvent)           
+    });
+    
+    // Show / Hide / Fill elements
+    loadingEl.classList.add("hide");
+    eventsContainer.innerHTML = output;
+
+    // Generates a Event Obj with more date-related fields
+    function generateEventObj(event){
+      const dateObj = getDateObjFromDate( new Date(event.start) );
+      return {
+        id: event.id,
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        year : dateObj.year,
+        month : dateObj.month,
+        day : dateObj.day,
+        dayOfWeek : dateObj.dayOfWeek,
+        weekNum : dateObj.weekNum,
+        hour : dateObj.hour,
+        minute : dateObj.minute
+      }
+    }
+    
+    // Generate Week Element
+    function generateWeekElement( week ){
+      const weekNum = week[0];
+      const eventsInThisWeek = week[1];
+      
+      let eventsElements = "";
+      eventsInThisWeek.forEach( function(event) {
+        eventsElements += generateEventElement(event)
+      })
+      
+      let weekEl = `
+      <li class="weekContainer">
+        <div class="collapsible-header">
+          <h5 class=" weekTitle n2s-blue-text">KW ${weekNum}</h5>
+        </div>
+        <div class="collapsible-body events row">${eventsElements}</div>
+      </li>`;
+
+      return weekEl
+    }
+
+    // Generate Event Element
+    function generateEventElement( event ){
+      const startDate = event.day +"."+ event.month;
+      const startTime = event.hour +":"+ event.minute;
+      
+      return `
+      <div class="event eventSelector border-radius col s12 m5" id="${event.id}">
+        <div class="row">
+          <div class="col s4 startDate n2s-blue-bg n2s-blue-light-text"><h5>${startDate}</h5></div>
+          <div class="col s8 startTime n2s-blue-text center-align"><h5>${startTime} Uhr</h5></div>
+          <div class="col s8 offset-s4 details align-center">        
+            <span class="startDayName">${event.dayOfWeek}</span>
+          </div>
+          <div class="hide start">${event.start}</div>
+        </div>
+      </div>`;                
+    } 
+  }                        
+
+  function showError(err){
+    console.error(err)
+  }
+
+  function getDateObjFromDate(date){
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+      dayOfWeek: getWeekdayFromDate( date ),
+      weekNum: getWeekNumber( date ),
+      hour: addPrefixZero( date.getHours() ),
+      minute: addPrefixZero( date.getMinutes() )          
+    }
+    
+    function addPrefixZero(number){
+      if( number < 10 ){
+        return "0"+number
+      }
+      return number
+    }
+    
+    function getWeekdayFromDate(date){
+      const dayInd = date.getDay();
+      if(dayInd === 0) return "Sonntag"
+      if(dayInd === 1) return "Montag"
+      if(dayInd === 2) return "Dienstag"
+      if(dayInd === 3) return "Mittwoch"
+      if(dayInd === 4) return "Donnerstag"
+      if(dayInd === 5) return "Freitag"
+      if(dayInd === 6) return "Samstag"        
+    }
+    
+    /* For a given date, get the ISO week number
+    *
+    * Based on information at:
+    *
+    *    http://www.merlyn.demon.co.uk/weekcalc.htm#WNR
+    *
+    * Algorithm is to find nearest thursday, it's year
+    * is the year of the week number. Then get weeks
+    * between that date and the first day of that year.
+    *
+    * Note that dates in one year can be weeks of previous
+    * or next year, overlap is up to 3 days.
+    *
+    * e.g. 2014/12/29 is Monday in week  1 of 2015
+    *      2012/1/1   is Sunday in week 52 of 2011
+    */      
+    function getWeekNumber(d) {
+      // Copy date so don't modify original
+      var copyDate = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      // Set to nearest Thursday: current date + 4 - current day number
+      // Make Sunday's day number 7
+      copyDate.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+      // Get first day of year
+      var yearStart = new Date(Date.UTC(copyDate.getUTCFullYear(),0,1));
+      // Calculate full weeks to nearest Thursday
+      var weekNo = Math.ceil(( ( (copyDate - yearStart) / 86400000) + 1)/7);
+      // Return week number
+      return weekNo;
+    }
+  }
+  
+</script>
