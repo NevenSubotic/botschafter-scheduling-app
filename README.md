@@ -29,7 +29,7 @@
   - `Line 4` same as above, but `MAX`
 
 ### Almost Ready
-1. Deploy as WebApp
+1. [Deploy](https://developers.google.com/apps-script/concepts/deployments) as [WebApp](https://developers.google.com/apps-script/guides/html#serve_html_as_a_web_app) and use the link it provides to send to users.
 
 ### Usage
 1. In you Calendar from `First Steps > 4`, add Slots with the title from `Code > Calendar > Line 28`. These will then be immediately available in the WebApp when users visit your site.
