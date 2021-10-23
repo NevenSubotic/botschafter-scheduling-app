@@ -21,7 +21,7 @@ Google Spreadsheet (Manager)
 1. Create a new Sheet and name it something like `Responses`
 1. [Create](https://developers.google.com/apps-script/guides/bound) a container-bound Apps Script Project in the Spreadsheet
     1. [Enable](https://developers.google.com/apps-script/guides/services/advanced) Advanced Service > Calendar App
-    1. [Add](https://developers.google.com/apps-script/guides/libraries) a new Library
+    1. [Add](https://developers.google.com/apps-script/guides/libraries) a new Library using the Script Code `1C1wBv5DEOYqNVVlP0LEOkz0w1VG5_Ics_GKcKVk3woUOq2FBB7e6izxI`, see [here for code](https://github.com/NevenSubotic/sheets-library)
 1. [Create](https://support.google.com/calendar/answer/37095?hl=en) a new Calendar to hold the slots
 
 
