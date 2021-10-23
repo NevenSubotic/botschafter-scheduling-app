@@ -9,7 +9,7 @@
 1. [Create](https://developers.google.com/apps-script/guides/bound) a container-bound Apps Script Project in the Spreadsheet
     1. [Enable](https://developers.google.com/apps-script/guides/services/advanced) Advanced Service > Calendar App
     1. [Add](https://developers.google.com/apps-script/guides/libraries) a new Library
-1. Create a new Calendar to hold the slots
+1. [Create](https://support.google.com/calendar/answer/37095?hl=en) a new Calendar to hold the slots
 
 
 #### Modifications in Code
@@ -27,3 +27,11 @@
  **js.html**
   - `Line 3` customize the `MIN_SELECTED_EVENTS` - a user needs to at least select this many events.
   - `Line 4` same as above, but `MAX`
+
+### Almost Ready
+1. Deploy as WebApp
+
+### Usage
+1. In you Calendar from `First Steps > 4`, add Slots with the title from `Code > Calendar > Line 28`. These will then be immediately available in the WebApp when users visit your site.
+1. When users visit your site, their form submissions will be stored in the `Code > TARGET_SHEET_NAME`. A submission will contain multiple events.
+1. When your manager then views the responses and selects a particular event within the sheet, they can then click on `n2s > Confirm Event` (in the Toolbar) and a new Event will be created in their Calendar (which is set in `Calendar > Line 24`). The event will contain the Title and Description set within `Code > Lines 92, 96`
