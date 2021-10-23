@@ -1,4 +1,17 @@
-# botschafter-scheduling-app
+# Scheduling App
+This app handles scheduling using Google Calendar and a public Web-App using Google Apps Script. In use there are two users, the Manager and the User (called Botschafter in the code). The Manager defines the available time slots and confirms the requests from the Users. Users use the public Web-App to select a number of available slots.
+
+Google Calendar (Manager)
+ - Set the free time slots
+ - When slots are confirmed, a Event in that users Calendar is created
+
+Web-App (User)
+  - Select / Request available slots
+
+Google Spreadsheet (Manager)
+  - See and confirm requests by Users
+  - Acts as Controller for / between Web-App, Google Calendar and the Sheet
+  - Notifies User when Manager has confirmed request per Email and invites User to Event
 
 
 ### Setup
